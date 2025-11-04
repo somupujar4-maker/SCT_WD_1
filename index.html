@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Café — Responsive Landing Page</title>
+<style>
+  :root{
+    --bg:#0f1724;
+    --card:#151827;
+    --accent:#ff6b35;
+    --muted:#98a0b0;
+    --glass: rgba(255,255,255,0.04);
+    --nav-height:72px;
+  }
+
+  /* Reset-ish */
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:linear-gradient(180deg,#08111a 0%, #0b1320 100%); color:#e6eef6; -webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  /* Fixed nav */
+  .nav {
+    position:fixed;
+    top:0; left:0; right:0;
+    height:var(--nav-height);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 1.25rem;
+    background:transparent;
+    transition: background 300ms ease, height 250ms ease, box-shadow 250ms ease, backdrop-filter 250ms ease;
+    z-index:1000;
+  }
+  .nav.scrolled {
+    background: linear-gradient(180deg, rgba(11,18,28,0.9), rgba(8,12,18,0.7));
+    box-shadow: 0 6px 22px rgba(2,6,12,0.6);
+    backdrop-filter: blur(6px);
+    height:60px;
+  }
+
+  .brand {display:flex; gap:.6rem; align-items:center; font-weight:700; letter-spacing:.06em; font-size:1.05rem}
+  .brand .logo {
+    width:42px; height:42px; border-radius:10px;
+    display:grid; place-items:center; font-weight:800; color:white;
+    background: linear-gradient(135deg,var(--accent), #ffd7b7);
+    box-shadow: 0 6px 16px rgba(255,107,53,0.15);
+  }
+
+  /* nav links */
+  .nav-links {
+    display:flex; gap:.5rem; align-items:center;
+    list-style:none;
+  }
+  .nav-links li {position:relative}
+  .nav-links a {
+    display:inline-block; padding:.6rem .8rem; border-radius:8px;
+    color:var(--muted); font-weight:600; font-size:.95rem;
+    transition: color 160ms ease, background 160ms ease, transform 120ms ease, box-shadow 160ms ease;
+  }
+
+  .nav-links a:hover,
+  .nav-links a:focus {
+    color:#fff;
+    background: rgba(255,255,255,0.03);
+    transform:translateY(-2px);
+    outline: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  }
+
+  .nav-links a.active {
+    color: #0b1220;
+    background: linear-gradient(90deg, #ffd7b7, var(--accent));
+    box-shadow: 0 6px 18px rgba(255,107,53,0.15);
+  }
+
+  /* CTA */
+  .cta {
+    margin-left: .6rem;
+    padding:.55rem .85rem; border-radius:10px; font-weight:700;
+    background: linear-gradient(90deg,var(--accent), #ff9a6b);
+    color:#08111a;
+    box-shadow: 0 8px 24px rgba(255,107,53,0.12);
+    display:inline-flex; align-items:center; gap:.5rem;
+    border: none; cursor:pointer;
+  }
+
+  /* Hamburger for mobile */
+  .hamburger {
+    display:none;
+    width:42px; height:42px; border-radius:8px;
+    align-items:center; justify-content:center;
+    background:var(--glass); border:1px solid rgba(255,255,255,0.03);
+    cursor:pointer;
+  }
+  .hamburger span {
+    display:block; width:20px; height:2px; background:var(--muted); margin:3px 0;
+    transition: transform 200ms ease, opacity 140ms ease;
+  }
+  .hamburger.open span:nth-child(1){ transform: translateY(5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2){ opacity:0; }
+  .hamburger.open span:nth-child(3){ transform: translateY(-5px) rotate(-45deg); }
+
+  /* Mobile menu */
+  .mobile-menu {
+    display:none;
+    position:fixed; top:var(--nav-height); right:16px;
+    background:linear-gradient(180deg, rgba(20,26,33,0.95), rgba(14,18,22,0.92));
+    border-radius:12px; padding:12px; box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+    min-width:200px;
+  }
+  .mobile-menu a{display:block; padding:.6rem .8rem; border-radius:8px; color:var(--muted); margin:6px 0}
+  .mobile-menu a:hover{ color:#fff; background:rgba(255,255,255,0.03) }
+
+  /* Hero */
+  header.hero {
+    padding-top: calc(var(--nav-height) + 28px);
+    min-height: calc(100vh - var(--nav-height));
+    display:grid; place-items:center;
+  }
+  .hero-inner{ max-width:1100px; width:100%; padding:2.5rem; display:grid; grid-template-columns:1fr 420px; gap:2rem; align-items:center}
+  .hero-card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:18px; padding:2rem; box-shadow: 0 12px 36px rgba(2,6,12,0.6);
+  }
+  .title{ font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height:1.02; margin-bottom:.6rem; color:#fff }
+  .subtitle{ color:var(--muted); margin-bottom:1.2rem; max-width:44ch }
+  .hero-cta{ display:flex; gap:.75rem }
+
+  /* sections */
+  section {padding:5rem 1.25rem; max-width:1100px; margin:0 auto}
+  .section-card{ background:var(--card); padding:2rem; border-radius:14px; box-shadow: 0 10px 30px rgba(2,6,12,0.6) }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem }
+  .feature{ padding:1rem; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)) }
+
+  /* footer */
+  footer{ padding:2.5rem 1.25rem; text-align:center; color:var(--muted) }
+
+  /* Responsive */
+  @media (max-width: 980px){
+    .hero-inner{ grid-template-columns:1fr; padding:1.25rem }
+    .nav-links{ display:none }
+    .hamburger{ display:flex }
+    .mobile-menu{ right:10px; left:10px }
+    .grid-3{ grid-template-columns:repeat(2,1fr) }
+  }
+  @media (max-width:600px){
+    .grid-3{ grid-template-columns:1fr }
+  }
+
+  /* focus styles for accessibility */
+  a:focus, button:focus { outline: 3px solid rgba(255,107,53,0.18); outline-offset:2px; border-radius:8px }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="mainNav" aria-label="Main navigation">
+  <div class="brand" aria-hidden="false">
+    <div class="logo" aria-hidden="true">☕</div>
+    <div>
+      <div style="font-size:.85rem;color:var(--muted)">Café</div>
+      <div style="font-size:.8rem; margin-top:2px; color:#fff; opacity:.9">Cozy & Fresh</div>
+    </div>
+  </div>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#home" data-target="home">Home</a></li>
+    <li><a href="#menu" data-target="menu">Menu</a></li>
+    <li><a href="#about" data-target="about">About</a></li>
+    <li><a href="#visit" data-target="visit">Visit</a></li>
+  </ul>
+
+  <div style="display:flex;align-items:center;gap:.6rem">
+    <button class="cta" id="orderBtn">Order Online</button>
+
+    <button class="hamburger" id="hamburger" aria-expanded="false" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu" role="menu" aria-hidden="true">
+    <a href="#home" data-target="home">Home</a>
+    <a href="#menu" data-target="menu">Menu</a>
+    <a href="#about" data-target="about">About</a>
+    <a href="#visit" data-target="visit">Visit</a>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-card">
+      <div class="title">Welcome to Café Cozy</div>
+      <div class="subtitle">Handcrafted coffee and fresh pastries — a warm place to meet, relax and enjoy the moment. We designed this landing page to be fully responsive and interactive.</div>
+      <div class="hero-cta">
+        <a class="cta" href="#menu">See Menu</a>
+        <a class="cta" href="#visit" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:#fff">Find Us</a>
+      </div>
+    </div>
+
+    <aside class="hero-card" aria-label="Specials">
+      <h3 style="margin-bottom:.4rem">Today's Special</h3>
+      <p style="color:var(--muted); margin-bottom:1rem">Cinnamon Latte + almond croissant — only $7.50</p>
+      <div style="display:flex; gap:.6rem">
+        <button class="cta">Reserve</button>
+        <button style="background:transparent;border:1px solid rgba(255,255,255,0.03);border-radius:10px;padding:.6rem .9rem;color:var(--muted)">Learn more</button>
+      </div>
+    </aside>
+  </div>
+</header>
+
+<main>
+  <section id="menu" aria-labelledby="menuTitle">
+    <div class="section-card">
+      <h2 id="menuTitle">Menu Highlights</h2>
+      <p style="color:var(--muted); margin: .6rem 0 1.2rem">Our curated favorites — roasted locally and brewed carefully.</p>
+      <div class="grid-3">
+        <div class="feature">
+          <h4>Espresso</h4>
+          <p style="color:var(--muted)">Bold and concentrated shot — choose single or double.</p>
+        </div>
+        <div class="feature">
+          <h4>Latte</h4>
+          <p style="color:var(--muted)">Silky steamed milk with our espresso.</p>
+        </div>
+        <div class="feature">
+          <h4>Pastries</h4>
+          <p style="color:var(--muted)">Daily-baked croissants, scones and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" aria-labelledby="aboutTitle">
+    <div class="section-card">
+      <h2 id="aboutTitle">About Us</h2>
+      <p style="color:var(--muted); margin-top:.6rem">We’re a small team passionate about coffee and community. Local beans, minimal waste, maximum warmth.</p>
+    </div>
+  </section>
+
+  <section id="visit" aria-labelledby="visitTitle">
+    <div class="section-card">
+      <h2 id="visitTitle">Visit</h2>
+      <p style="color:var(--muted); margin-top:.6rem">123 Central Ave — Open daily 7am–6pm</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div style="max-width:1100px;margin:0 auto;">
+    <p style="margin-bottom:.6rem">© Café Cozy — made with care</p>
+    <p style="color:var(--muted);font-size:.9rem">This is a demo landing page showing a fixed, interactive navigation that responds to scroll and hover.</p>
+  </div>
+</footer>
+
+<script>
+/* Interactivity:
+   - Toggle mobile menu
+   - Add "scrolled" class when page scrolls past threshold
+   - Highlight active nav link as sections enter view (IntersectionObserver)
+   - Smooth scroll behavior for navigation links
+*/
+
+(function() {
+  const nav = document.getElementById('mainNav');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const mobileLinks = document.querySelectorAll('#mobileMenu a');
+  const allLinks = [...navLinks, ...mobileLinks];
+  const sections = document.querySelectorAll('main section, header.hero');
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  // Toggle mobile menu
+  hamburger.addEventListener('click', () => {
+    const open = hamburger.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(open));
+    mobileMenu.style.display = open ? 'block' : 'none';
+    mobileMenu.setAttribute('aria-hidden', String(!open));
+  });
+
+  // Close mobile menu when clicking a link
+  mobileLinks.forEach(a => a.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    mobileMenu.style.display = 'none';
+    mobileMenu.setAttribute('aria-hidden', 'true');
+  }));
+
+  // Smooth scroll on click
+  allLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const targetId = link.getAttribute('href')?.replace('#','');
+      if (!targetId) return;
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      e.preventDefault();
+      // Keyboard-friendly smooth scroll
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // update focus after scrolling for accessibility
+      setTimeout(() => el.setAttribute('tabindex','-1') || el.focus(), 600);
+    });
+  });
+
+  // Add nav style on scroll
+  const scrollThreshold = 40;
+  function onScroll(){
+    if (window.scrollY > scrollThreshold) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // Intersection Observer to highlight active link
+  const observerOptions = {
+    root: null, rootMargin: '-30% 0px -45% 0px', threshold: 0
+  };
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.id;
+      const link1 = document.querySelector('.nav-links a[href="#'+id+'"]');
+      const link2 = document.querySelector('#mobileMenu a[href="#'+id+'"]');
+
+      if (entry.isIntersecting) {
+        // remove active from all
+        document.querySelectorAll('.nav-links a, #mobileMenu a').forEach(a => a.classList.remove('active'));
+        if (link1) link1.classList.add('active');
+        if (link2) link2.classList.add('active');
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(s => observer.observe(s));
+
+  // Keyboard: close mobile menu on Escape
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      mobileMenu.style.display = 'none';
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      hamburger.focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>#!/bin/sh
+#
+# An example hook script to verify what is about to be committed.
+# Called by "git merge" with no arguments.  The hook should
+# exit with non-zero status after issuing an appropriate message to
+# stderr if it wants to stop the merge commit.
+#
+# To enable this hook, rename this file to "pre-merge-commit".
+
+. git-sh-setup
+test -x "$GIT_DIR/hooks/pre-commit" &&
+        exec "$GIT_DIR/hooks/pre-commit"
+:
